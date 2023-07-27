@@ -218,22 +218,54 @@ if(SearchInFuturaResult == 1) {
   var blankCustomer = await createBlankCustomer(apiEndpoint, headers);
   
   customerFields.get_web_customerResult.web_kde_nummer = blankCustomer.get_web_new_customer_idResult.web_kde_nummer;
-  commonFields.get_web_commonResult.web_add_nummer = blankCustomer.get_web_new_customer_idResult.web_kde_nummer
+  commonFields.get_web_commonResult.web_add_nummer = blankCustomer.get_web_new_customer_idResult.web_kde_nummer;
+  jsonData.get_web_addressResult.Tweb_ans[0].web_ans_number = blankCustomer.get_web_new_customer_idResult.web_kde_nummer;
+  jsonData.get_web_addressResult.Tweb_ans[0].web_ans_email = 'rohan.1998@gmail.com';
+
+   //addressfields variable updated with new get_web_addressResult.Tweb_ans result
+   addressFields = jsonData.get_web_addressResult.Tweb_ans;
+
+  // Update the customer payload for updating customer detail API
+  updateCustomerpayload = {
+    'web_kde': customerFields.get_web_customerResult,
+    'web_add': commonFields.get_web_commonResult,
+    'web_ans': addressFields,
+    'web_user': '',
+    'web_Pass': ''
+  };
+
+  //calling update futura API
+  var updateCustomerFutura = await UpdateCustomerInFututra(apiEndpoint, headers, updateCustomerpayload)
 
   const response = {
     statusCode: 200,
-    body: addressFields[0].web_ans_nummer
+    body: updateCustomerFutura
   }
   return response
 
 }
 else {
-  //customer found
-  finalSearchResult =  JSON.stringify(result);
+  //customer found in futura
+  jsonData.get_web_addressResult.Tweb_ans[0].web_ans_email = 'ritesh@gmail.com';
+
+   //addressfields variable updated with new get_web_addressResult.Tweb_ans result
+   addressFields = jsonData.get_web_addressResult.Tweb_ans;
+
+  // Update the customer payload for updating customer detail API
+  updateCustomerpayload = {
+    'web_kde': customerFields.get_web_customerResult,
+    'web_add': commonFields.get_web_commonResult,
+    'web_ans': addressFields,
+    'web_user': '',
+    'web_Pass': ''
+  };
+
+  //calling update futura API
+  var updateCustomerFutura = await UpdateCustomerInFututra(apiEndpoint, headers, updateCustomerpayload)
 
   const response = {
     statusCode: 200,
-    body: finalSearchResult
+    body: updateCustomerFutura
   }
   return response
 }
