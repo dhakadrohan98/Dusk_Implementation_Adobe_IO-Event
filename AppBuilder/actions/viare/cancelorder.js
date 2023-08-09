@@ -45,6 +45,7 @@ async function main (params) {
 
     var orderResponse = await getOrderInfo();
     var CreditMemoResponse = await getCreditMemo(params,params.data.value.entity_id);
+    var cancelOrderPayload = await matchingOrderItems(params.data.value.order_id, params.data.value.entity_id);
     // params,params.data.value.order_id
     // var creditMemoResponse = await getCreditMemo(params, params.data.value.entity_id);
 
