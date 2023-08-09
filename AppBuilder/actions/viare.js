@@ -354,6 +354,23 @@ async function clickAndCollect(skuArray,storesArray,params){
     return finalResponse;
 }
 
+function deleteOrder(params,headers,viarePayload){
+    return new Promise((resolve, reject) => {
+            soap.createClient(params.VIARE_ORDER_API, {wsdl_headers: headers}, function(err, client) {
+            if(err){
+                reject(err)
+            }
+            client.DeleteOrderItem(viarePayload, function(err, result) {
+                if(err){
+                    reject(err)
+                }else{
+                    resolve(result)
+                }
+            })
+        })
+})
+}
+
 //noinspection JSAnnotator
 module.exports = {
   setViareAuthCode,
@@ -364,5 +381,6 @@ module.exports = {
   generatePayloadForOrderCreate,
   createOrder,
   geViaretOrderInfo,
-  clickAndCollect
+  clickAndCollect,
+  deleteOrder
 }
