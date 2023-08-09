@@ -175,7 +175,47 @@ async function getCreditMemo(params, creditMemoId){
             }
 }
 
+async function matchingOrderItems(orderId, creditMemoId) {
 
+    var finalResponse = [];
+    var orderResponse = await getOrderInfo(orderId);
+    var creditmemoResponse = await getCreditMemo(creditMemoId);
+
+    orderItemsLength = orderResponse.items.length;
+    creditMemoLength = creditmemoResponse.items.length
+    console.log("orderItemsLength: " +orderItemsLength);
+    console.log("creditMemoLength: "+creditMemoLength);
+    var i=0,j=0,k=0;
+    var shippedArray = [];
+
+    while(i<orderItemsLength) {
+
+        itemQuantityShippedFromOrder = orderResponse.items[i].qty_shipped;
+
+        if(itemQuantityShippedFromOrder > 0) {
+            shippedArray[k] = orderResponse.items[i].sku;
+            k++;
+        }
+        i++;
+    }
+    console.log("shippedArray: "+shippedArray)
+
+    for(l=0; l<shippedArray.length; l++) {
+
+        // if(creditmemoResponse.items[l] == undefined) {
+        //     break;
+        // }
+        if((creditmemoResponse.items[l] != undefined) && shippedArray.includes(creditmemoResponse.items[l].sku) == true) {
+
+            var temp = {"orderItemID": creditmemoResponse.items[l].sku, 
+                        "quantity": creditmemoResponse.items[l].qty}
+            finalResponse.push(temp);
+        }
+    }
+
+    console.log("shippedArray after creditmemo condition: "+ JSON.stringify(finalResponse));
+    return JSON.stringify(finalResponse);
+}
 
 module.exports = {
   getProduct,
@@ -184,5 +224,6 @@ module.exports = {
   converImageintoBase64,
   getOrderInfo,
   getProductOptions,
-  getCreditMemo
+  getCreditMemo,
+  matchingOrderItems
 }
