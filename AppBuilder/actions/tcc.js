@@ -27,6 +27,55 @@ async function authenticate(params){
         }
 }
 
+//Prepare array of objects of items(from rmaDetails object) which need to be passed as payload in a RMA API of TCC. 
+async function prepareItems(rmaDetails, nextDate, sku){
+
+    if(rmaDetails.items.length != undefined) {
+        
+        var rmaItemsLength = rmaDetails.items.length;
+        var result = [];
+        for(i=0; i<rmaItemsLength; i++) {
+            result.push({
+                "BatchNo": "",
+                "BoxPackCountOnly": null,
+                "CheckQuality": "Yes",
+                "CollectionDate": null,
+                "Confidential": null,
+                "CountIndividualItems": null,
+                "DeliveryDueDate": nextDate,
+                "Description": rmaDetails.order_id,
+                "ForeignFulfilmentID": rmaDetails.items[i].rma_entity_id,
+                "ForeignReference": null,
+                "ID": null,
+                "IsBulkyItem": null,
+                "JobManagerEmail": "",
+                "JobManagerName": "",
+                "MinReOrderLevel": null,
+                "Notes": null,
+                "PackageQuantity": null,
+                "PackageType": null,
+                "PhotoRequired": null,
+                "ProductGroup": null,
+                "ProductPartNumber": null,
+                "Quantity": rmaDetails.items[i].qty_requested,
+                "Quarantined": null,
+                "SampleRequired": null,
+                "Source": "",
+                "StockCode": sku,
+                "StockLocationID": 1,
+                "SubCategory": null,
+                "SupplierLocation": null,
+                "UnitOfMeasure": "",
+                "WarehouseLocationID": null
+                });
+        }
+    }
+    else {
+        result['error'] ="please check rma item's length.";
+    } 
+    return result;
+}
+
 
 async function createRMA(params, authenticationToken, rmaDetails, customerDetails, sku){
 
@@ -37,9 +86,11 @@ async function createRMA(params, authenticationToken, rmaDetails, customerDetail
 
     var dateString = rmaDetails.date_requested;
     const epochTimestamp = new Date(dateString).getTime() / 1000;
-    var order_id = rmaDetails.order_id.toString();
     
     var state = customerDetails.addresses[0].region.region_code;
+    //storing all items of RMA which need to be passed in {payload.Items}.
+    var items = await prepareItems(rmaDetails, nextDate, sku);
+
     //prepairing payload
     var payload = {
             "AuthenticationToken": authenticationToken,
@@ -48,47 +99,12 @@ async function createRMA(params, authenticationToken, rmaDetails, customerDetail
             "DateCreated": epochTimestamp,
             "DateModified": epochTimestamp,
             
-            "Description": order_id,
+            "Description": rmaDetails.order_id,
             "ForeignJobID": 123,
             "ForeignReference": null,
             "ScheduledReceivingDate": nextDate,
             "ID": null,
-            "Items": [
-            {
-            "BatchNo": "",
-            "BoxPackCountOnly": null,
-            "CheckQuality": "Yes",
-            "CollectionDate": null,
-            "Confidential": null,
-            "CountIndividualItems": null,
-            "DeliveryDueDate": nextDate,
-            "Description": rmaDetails.order_id,
-            "ForeignFulfilmentID": rmaDetails.items[0].rma_entity_id,
-            "ForeignReference": null,
-            "ID": null,
-            "IsBulkyItem": null,
-            "JobManagerEmail": "",
-            "JobManagerName": "",
-            "MinReOrderLevel": null,
-            "Notes": null,
-            "PackageQuantity": null,
-            "PackageType": null,
-            "PhotoRequired": null,
-            "ProductGroup": null,
-            "ProductPartNumber": null,
-            "Quantity": rmaDetails.items[0].qty_requested,
-            "Quarantined": null,
-            "SampleRequired": null,
-            "Source": "",
-            "StockCode": sku,
-            "StockLocationID": 1,
-            "SubCategory": null,
-            "SupplierLocation": null,
-            "UnitOfMeasure": "",
-            "WarehouseLocationID": null
-            }
-            
-            ],
+            "Items": items,
             "JobReferenceID": "",
             "RequestorEmail": customerDetails.email,
             "RequestorName": customerDetails.firstname,
@@ -124,5 +140,7 @@ async function createRMA(params, authenticationToken, rmaDetails, customerDetail
 
 module.exports = {
     authenticate,
-    createRMA
+    createRMA,
+    prepareItems
+
 }
