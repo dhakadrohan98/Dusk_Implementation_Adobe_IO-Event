@@ -79,9 +79,8 @@ async function main (params) {
               authenticationToken = authenticationResult.Payload.AuthenticationToken;
               myCache.set("token",authenticationToken);
             }
-            result = authenticationToken;
 
-            // result = await createRMA(params, authenticationToken, rmaDetails, customerDetails, sku);
+            result = await createRMA(params, authenticationToken, rmaDetails, customerDetails, sku);
           }
         }
     }
