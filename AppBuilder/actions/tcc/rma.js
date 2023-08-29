@@ -71,15 +71,17 @@ async function main (params) {
             var authenticationToken = "";
             //caching mechanism
             const myCache = new NodeCache();  
-            if(myCache.has('token')) {
-              authenticationToken = myCache.get('token');
-            }
-            else {
+            var tcc_token = myCache.get('tccRmaToken');
+
+            if(tcc_token == undefined) {
               var authenticationResult = await authenticate(params); 
               authenticationToken = authenticationResult.Payload.AuthenticationToken;
-              myCache.set("token",authenticationToken);
+              await myCache.set("tccRmaToken",authenticationToken);
             }
-
+            else {
+              authenticationToken = myCache.get('tccRmaToken');
+            }
+            result = authenticationToken;
             result = await createRMA(params, authenticationToken, rmaDetails, customerDetails, sku);
           }
         }
